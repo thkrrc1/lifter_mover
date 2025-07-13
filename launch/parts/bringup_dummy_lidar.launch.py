@@ -22,27 +22,20 @@ import shutil
 import yaml
 
 
-def bringup_dummy_lidar(description):
+def bringup_dummy_lidar(dummy_map_file, description):
     lidar1 = Node(
         package="dummy_scan",
         executable="dummy_scan",
         output="screen",
         remappings=[('/scan', '/scan_raw')],
         )
-    
-    map_yaml_file = os.path.join(
-            get_package_share_directory('lifter_mover'),
-            'config',
-            'navigation',
-            'map',
-            'scan_map.yaml')
 
     scan_map = Node(
                 package='nav2_map_server',
                 executable='map_server',
                 name='scan_map_server',
                 output='screen',
-                parameters=[{'yaml_filename': map_yaml_file}],
+                parameters=[{'yaml_filename': dummy_map_file}],
                 remappings=[('/map', '/scan_map')])
     lifecycle = Node(
                  package='nav2_lifecycle_manager',
@@ -72,6 +65,12 @@ def bringup_dummy_lidar(description):
     
 
 def generate_launch_description():
-    launch_description = launch.LaunchDescription()
-    bringup_dummy_lidar(launch_description)
-    return launch_description
+    dummy_map_file = LaunchConfiguration("dummy_map")
+    dummy_map_file_arg = DeclareLaunchArgument("dummy_map")
+
+    ld = LaunchDescription()
+    ld.add_action(dummy_map_file_arg)
+    
+    bringup_dummy_lidar(dummy_map_file, ld)
+
+    return ld

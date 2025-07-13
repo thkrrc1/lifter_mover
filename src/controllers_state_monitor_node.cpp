@@ -10,8 +10,10 @@ public:
   : Node("controller_state_monitor"), launched_(false)
   {
     this->declare_parameter<std::string>("robot_pkg_path", "");
+    this->declare_parameter<std::string>("dummy_map", "");
     
     robot_pkg_path_ = this->get_parameter("robot_pkg_path").as_string();
+    dummy_map_ = this->get_parameter("dummy_map").as_string();
   
     for (const auto & name : target_nodes) {
       states_[name] = "unknown";
@@ -42,7 +44,8 @@ private:
     
     std::stringstream nav_cmd;
     nav_cmd << "ros2 launch " << robot_pkg_path_
-            << "/launch/parts/bringup_dummy_lidar.launch.py " << " &";
+            << "/launch/parts/bringup_dummy_lidar.launch.py "
+            << "dummy_map:=" << dummy_map_ << " &";
     std::system(nav_cmd.str().c_str());
     
     launched_ = true;
@@ -52,6 +55,7 @@ private:
   std::map<std::string, std::string> states_;
   bool launched_;
   std::string robot_pkg_path_;
+  std::string dummy_map_;
 };
 
 int main(int argc, char ** argv) {

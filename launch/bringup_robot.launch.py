@@ -105,6 +105,7 @@ def generate_launch_description():
         output='screen',
         parameters=[
             {'robot_pkg_path': robot_pkg_path},
+            {'dummy_map': read_map_yaml_file},
         ],
         condition=IfCondition(simulation)
     )
