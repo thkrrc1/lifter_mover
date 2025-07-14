@@ -208,7 +208,7 @@ def generate_launch_description():
         executable="tf_static_ready_monitor_node",
         name="tf_static_ready_monitor_node",
         output="screen",
-        parameters=[{'cm_param_path': controller_settings}, {'teleop_param_path': teleop_settings}, {'lidar_param_path': lidar_settings}],
+        parameters=[{'cm_param_path': controller_settings}, {'teleop_param_path': teleop_settings}, {'lidar_param_path': lidar_settings}, {'simulation': simulation}],
     ))
 
     ld.add_action(OpaqueFunction(function=load_driver_settings, kwargs={
