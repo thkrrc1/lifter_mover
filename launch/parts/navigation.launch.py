@@ -18,7 +18,7 @@ from ament_index_python.packages import get_package_share_directory
 
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, GroupAction, SetEnvironmentVariable
-from launch.conditions import IfCondition
+from launch.conditions import IfCondition, UnlessCondition
 from launch.substitutions import LaunchConfiguration, PythonExpression
 from launch_ros.actions import LoadComposableNodes, SetParameter
 from launch_ros.actions import Node
@@ -37,6 +37,7 @@ def generate_launch_description():
     params_file = LaunchConfiguration('params_file')
     use_composition = LaunchConfiguration('use_composition')
     container_name = LaunchConfiguration('container_name')
+    slam_mode = LaunchConfiguration('slam_mode')
     container_name_full = (namespace, '/', container_name)
     use_respawn = LaunchConfiguration('use_respawn')
     log_level = LaunchConfiguration('log_level')
@@ -116,6 +117,21 @@ def generate_launch_description():
 
     declare_log_level_cmd = DeclareLaunchArgument(
         'log_level', default_value='info', description='log level'
+    )
+    
+    declare_slam_mode_cmd = DeclareLaunchArgument(
+        'slam_mode',
+        default_value='False',
+        description='Use slam_toolbox',
+    )
+    
+    static_tf_node = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        name='static_map_to_odom_tf',
+        arguments=['0', '0', '0', '0', '0', '0', '1', 'map', 'odom'],
+        output='screen',
+        condition=UnlessCondition(slam_mode),
     )
 
     load_nodes = GroupAction(
@@ -257,6 +273,7 @@ def generate_launch_description():
     ld = LaunchDescription()
 
     # Set environment variables
+    ld.add_action(static_tf_node)
     ld.add_action(stdout_linebuf_envvar)
 
     # Declare the launch options
@@ -268,6 +285,7 @@ def generate_launch_description():
     ld.add_action(declare_container_name_cmd)
     ld.add_action(declare_use_respawn_cmd)
     ld.add_action(declare_log_level_cmd)
+    ld.add_action(declare_slam_mode_cmd)
     ld.add_action(container)
     # Add the actions to launch all of the navigation nodes
     ld.add_action(load_nodes)

@@ -90,10 +90,6 @@ def generate_launch_description():
         executable='amcl_state_monitor_node',
         name='amcl_state_monitor_node',
         output='screen',
-        parameters=[
-            {'robot_pkg_path': robot_pkg},
-            {'simulation': simulation},
-        ],
         condition=UnlessCondition(slam_mode)
     )
     ld.add_action(bringup_tools_node)

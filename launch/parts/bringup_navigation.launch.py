@@ -212,6 +212,7 @@ def generate_launch_description():
                     'params_file': navigation_params_file,
                     'use_composition': use_composition,
                     'use_respawn': use_respawn,
+                    'slam_mode': slam,
                     'container_name': 'nav2_container',
                 }.items(),
             ),
