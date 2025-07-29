@@ -18,4 +18,4 @@ lifter_controller:
      stop_trajectory_duration: 0.4
      constraints:
        goal_time: 1.0
-       stopped_velocity_tolerance: 0.0
+       stopped_velocity_tolerance: 0.02

@@ -46,18 +46,18 @@ controller_server:
         time_steps: 30 #56
         model_dt: 0.1 #0.05
         batch_size: 2000 
-        ax_min:  3.0 #3.0
-        ax_max:  -3.0 #-3.0
+        ax_min:  -3.0 #3.0
+        ax_max:  3.0 #-3.0
         ay_max:  3.0 #3.0
         az_max:  3.5 #3.5
         vx_std:  0.2 #0.2
         vy_std:  0.05 #0.2
         wz_std:  0.4 #0.4
         vx_max:  0.65 #0.5
-        vx_min:  -0.2 #-0.35
+        vx_min:  -0.0 #-0.35
         vy_max:  0.2 #0.5
         wz_max:  2.0 #1.9
-        iteration_count: 1
+        iteration_count: 2
         prune_distance: 3.0 #1.7
         transform_tolerance: 0.3
         temperature: 1.0 #0.3
@@ -109,7 +109,7 @@ controller_server:
           critical_weight: 66.0
           repulsion_weight: 5.0
           collision_cost: 100000.0
-          collision_margin_distance: 0.2
+          collision_margin_distance: 0.3
           near_goal_distance: 0.3
           inflation_layer_name: "inflation_layer"
            
@@ -158,8 +158,8 @@ local_costmap:
          inflation_layer:
             plugin: nav2_costmap_2d::InflationLayer
             enabled: true
-            inflation_radius: 0.5 #0.70
-            cost_scaling_factor: 10.0 #3.0
+            inflation_radius: 0.7 #0.70
+            cost_scaling_factor: 5.0 #3.0
          always_send_full_costmap: true
          
 global_costmap:
