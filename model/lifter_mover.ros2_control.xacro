@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-  <xacro:macro name="noid_ros2_control" params="name driver_settings">
+  <xacro:macro name="lifter_mover_ros2_control" params="name driver_settings">
 
     <ros2_control name="${name}" type="system">
       <hardware>

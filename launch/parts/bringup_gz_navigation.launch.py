@@ -108,7 +108,7 @@ def generate_launch_description():
 
     declare_map_yaml_cmd = DeclareLaunchArgument(
         'map',
-        default_value=PathJoinSubstitution([robot_pkg, 'config', 'navigation', 'map', 'gazebo_map_0627.yaml']),
+        default_value=PathJoinSubstitution([robot_pkg, 'config', 'navigation', 'map', 'gz_test_map.yaml']),
         description='Full path to map yaml file to load'
     )
 

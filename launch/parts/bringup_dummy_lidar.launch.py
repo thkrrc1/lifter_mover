@@ -1,25 +1,11 @@
-import os
 from ament_index_python.packages import get_package_share_directory
-from ament_index_python.packages import get_package_share_path
 
 import launch
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription
-from launch.actions import DeclareLaunchArgument, RegisterEventHandler
-from launch.conditions import IfCondition, UnlessCondition
-from launch.event_handlers import OnProcessExit
-from launch.substitutions import Command, FindExecutable, LaunchConfiguration, PathJoinSubstitution
-from launch.actions import DeclareLaunchArgument, OpaqueFunction
-from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch_ros.descriptions import ComposableNode, ParameterFile
-from nav2_common.launch import RewrittenYaml
-import launch_ros.actions
-from launch_ros.substitutions import FindPackageShare
-from launch_ros.parameter_descriptions import ParameterValue
+from launch.actions import  DeclareLaunchArgument, Shutdown
+from launch.substitutions import  LaunchConfiguration, PathJoinSubstitution
+from launch.actions import DeclareLaunchArgument
 from launch_ros.actions import Node
-import xacro
-import shutil
-import yaml
 
 
 def bringup_dummy_lidar(dummy_map_file, description):
@@ -27,7 +13,7 @@ def bringup_dummy_lidar(dummy_map_file, description):
         package="dummy_scan",
         executable="dummy_scan",
         output="screen",
-        remappings=[('/scan', '/scan_raw')],
+        remappings=[('/scan', '/scan_raw')]
         )
 
     scan_map = Node(
@@ -36,7 +22,8 @@ def bringup_dummy_lidar(dummy_map_file, description):
                 name='scan_map_server',
                 output='screen',
                 parameters=[{'yaml_filename': dummy_map_file}],
-                remappings=[('/map', '/scan_map')])
+                remappings=[('/map', '/scan_map')],
+                on_exit=Shutdown())
     lifecycle = Node(
                  package='nav2_lifecycle_manager',
                  executable='lifecycle_manager',

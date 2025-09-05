@@ -32,5 +32,5 @@
        top_link="${lifter_top_link}" />
         
     <xacro:include filename="$(find lifter_mover)/model/lifter_mover.ros2_control.xacro" />
-    <xacro:noid_ros2_control name="lifter_mover" driver_settings="$(arg driver_settings)" />
+    <xacro:lifter_mover_ros2_control name="lifter_mover" driver_settings="$(arg driver_settings)" />
 </robot>

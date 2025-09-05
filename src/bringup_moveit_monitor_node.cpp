@@ -1,26 +1,26 @@
 #include "rclcpp/rclcpp.hpp"
 #include "lifecycle_msgs/msg/transition_event.hpp"
-#include "std_msgs/msg/bool.hpp"
 #include "lifecycle_msgs/srv/get_state.hpp"
 #include <string>
 #include <sstream>
 #include <vector>
 #include <map>
 
-class ControllersStateMonitor : public rclcpp::Node {
+class BringupMoveitMonitor : public rclcpp::Node {
 public:
-  ControllersStateMonitor(const std::vector<std::string> & target_nodes)
-  : Node("controller_state_monitor"), launched_(false)
+  BringupMoveitMonitor(const std::vector<std::string> & moveit_targets)
+  : Node("bringup_moveit_monitor"), moveit_launched_(false)
   {
+    this->declare_parameter<std::string>("pkg_name", "");
     this->declare_parameter<std::string>("robot_pkg_path", "");
-    this->declare_parameter<std::string>("dummy_map", "");
-    
+
+    pkg_name_ = this->get_parameter("pkg_name").as_string();
     robot_pkg_path_ = this->get_parameter("robot_pkg_path").as_string();
-    dummy_map_ = this->get_parameter("dummy_map").as_string();
-  
-    for (const auto & name : target_nodes) {
+
+    for (const auto & name : moveit_targets) {
       states_[name] = "unknown";
 
+      // ---- サブスクライバ ----
       auto sub = create_subscription<lifecycle_msgs::msg::TransitionEvent>(
         "/" + name + "/transition_event", 10,
         [this, name](lifecycle_msgs::msg::TransitionEvent::SharedPtr msg) {
@@ -59,43 +59,49 @@ private:
   }
 
   void check_all_active() {
-    if (launched_) return;
+    if (moveit_launched_) return;
 
     std::vector<std::string> targets;
     for (const auto & pair : states_) {
       targets.push_back(pair.first);
     }
 
-    if (!all_active("dummy_lidar", targets)) {
-      return; 
+    if (!all_active("moveit", targets)) {
+      return;  
     }
 
-    RCLCPP_INFO(get_logger(), "All nodes are ACTIVE. Launching Dummy_lidar...");
-    
-    std::stringstream nav_cmd;
-    nav_cmd << "ros2 launch " << robot_pkg_path_
-            << "/launch/parts/bringup_dummy_lidar.launch.py "
-            << "dummy_map:=" << dummy_map_ << " &";
-    std::system(nav_cmd.str().c_str());
-    
-    launched_ = true;
+    RCLCPP_INFO(get_logger(), "All MoveIt nodes are ACTIVE. Launching MoveIt...");
+
+    std::stringstream moveit_cmd;
+    moveit_cmd << "ros2 launch " << robot_pkg_path_
+               << "/launch/parts/bringup_moveit.launch.py "
+               << "pkg_name:=" << pkg_name_ << " &";
+    std::system(moveit_cmd.str().c_str());
+
+    moveit_launched_ = true;
   }
 
   std::vector<rclcpp::Subscription<lifecycle_msgs::msg::TransitionEvent>::SharedPtr> subs_;
   std::map<std::string, std::string> states_;
-  bool launched_;
+  bool moveit_launched_;
+  std::string pkg_name_;
   std::string robot_pkg_path_;
-  std::string dummy_map_;
 };
 
 int main(int argc, char ** argv) {
   rclcpp::init(argc, argv);
-  std::vector<std::string> names = {
-    "mechanum_controller", 
-    "joint_state_broadcaster"
+  std::vector<std::string> moveit_nodes = {
+    "mechanum_controller",
+    "joint_state_broadcaster",
+    "lifter_controller",
+    "aero_controller",
+    "status_controller",
+    "robotstatus_controller",
+    "config_controller",
+    "diagnostic_controller"
   };
 
-  auto node = std::make_shared<ControllersStateMonitor>(names);
+  auto node = std::make_shared<BringupMoveitMonitor>(moveit_nodes);
   rclcpp::spin(node);
   rclcpp::shutdown();
   return 0;

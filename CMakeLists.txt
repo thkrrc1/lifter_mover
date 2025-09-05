@@ -18,8 +18,11 @@ find_package(tf2_msgs REQUIRED)
 find_package(ament_index_cpp REQUIRED)
 find_package(nav2_msgs REQUIRED)
 find_package(lifecycle_msgs REQUIRED)
+find_package(controller_manager_msgs REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(sensor_msgs REQUIRED)
+find_package(rclcpp_action REQUIRED)
+find_package(moveit_msgs REQUIRED)
 
 find_package(gz-sim8 REQUIRED)
 set(GZ_SIM_VER ${gz-sim8_VERSION_MAJOR})
@@ -44,6 +47,7 @@ install(DIRECTORY
   gazebo
   launch
   model
+  moveit
   rviz
   stroke_converter/csv
   DESTINATION share/${PROJECT_NAME}/
@@ -77,6 +81,14 @@ add_executable(save_map_client_node src/save_map_client_node.cpp)
 add_executable(bringup_navigation_monitor_node src/bringup_navigation_monitor_node.cpp)
 add_executable(amcl_state_monitor_node src/amcl_state_monitor_node.cpp)
 add_executable(controllers_state_monitor_node src/controllers_state_monitor_node.cpp)
+add_executable(bringup_moveit_monitor_node src/bringup_moveit_monitor_node.cpp)
+add_executable(bringup_rviz2_monitor_node src/bringup_rviz2_monitor_node.cpp)
+
+ament_target_dependencies(bringup_rviz2_monitor_node
+  rclcpp
+  rclcpp_action
+  moveit_msgs
+)
 
 ament_target_dependencies(tf_static_monitor_node
   rclcpp
@@ -100,6 +112,13 @@ ament_target_dependencies(bringup_navigation_monitor_node
   sensor_msgs
 )
 
+ament_target_dependencies(bringup_moveit_monitor_node
+  rclcpp
+  lifecycle_msgs
+  controller_manager_msgs
+  std_msgs
+)
+
 ament_target_dependencies(controllers_state_monitor_node
   rclcpp
   lifecycle_msgs
@@ -118,6 +137,8 @@ install(TARGETS
   bringup_navigation_monitor_node
   controllers_state_monitor_node
   amcl_state_monitor_node
+  bringup_rviz2_monitor_node
+  bringup_moveit_monitor_node
   DESTINATION lib/${PROJECT_NAME}
 )
 
